@@ -17,11 +17,47 @@ mamba create -n duplicate_id_resolver --channel bioconda \
 # Activate environment
 conda activate duplicate_id_resolver
 
-# Run a single file
+# Run a single file with duplicates
+nextflow characterize_dup_IDs.nf --input 'data/1kgp/GRCh37/GRCh37_example_data_duplicates.vcf.gz'
+
+# Run a single file without duplicates
 nextflow characterize_dup_IDs.nf --input 'data/1kgp/GRCh37/GRCh37_example_data.vcf.gz'
 
 # Check output
 zcat out/mapfiles/GRCh37_example_data.vcf.map.gz | head | column -t
 ```
 
+## DEV
 
+### create example data
+Make some duplicates from existing example data
+```
+#extract header
+zcat data/1kgp/GRCh37/GRCh37_example_data.vcf.gz | grep "#"  > tmp1
+
+#take out 5 random rows to use as duplicates
+zcat data/1kgp/GRCh37/GRCh37_example_data.vcf.gz | awk '
+  $0 !~ "#"{print $0}
+  NR==20{print $0}
+  NR==134{print $0}
+  NR==354{print $0}
+  NR==687{print $0}
+  NR==870{print $0}
+' > tmp2
+
+# sort and make tabix index
+sort -t "$(printf '\t')" -k1,1 -k2,2n tmp2 > tmp2b
+
+# merge with header
+cat tmp1 tmp2b > tmp3
+
+# bgzip and tabix (so that we can use bcftools)
+bgzip -c tmp3 > GRCh37_example_data_duplicates.vcf.gz
+tabix -p vcf GRCh37_example_data_duplicates.vcf.gz
+
+# Add new example data to the example data folder
+mv GRCh* data/1kgp/GRCh37/
+
+# remove tmp files (careful!)
+# rm tmp*
+```
