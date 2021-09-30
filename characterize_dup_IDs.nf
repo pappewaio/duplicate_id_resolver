@@ -32,7 +32,7 @@ process extract_from_vcf {
       tuple val(id), path('extracted.vcf.gz')
     script:
       """
-      extract_from_vcf.sh ${filein} > "duplicate_ids"
+      extract_from_vcf.sh ${filein} ${vcfin} > "extracted.vcf.gz"
       """
 }
 
@@ -47,6 +47,10 @@ workflow {
 
   extract_ids_from_vcf_and_create_index(vcf_filename_tracker_added)
   find_duplicated_entries(extract_ids_from_vcf_and_create_index.out)
+  vcf_filename_tracker_added
+    .join(find_duplicated_entries.out, by:0)
+    .set { to_extract_vcf }
+  extract_from_vcf(to_extract_vcf)
 
 }
 
