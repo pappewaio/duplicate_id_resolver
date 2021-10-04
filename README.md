@@ -40,7 +40,10 @@ done
 ### create example data from 1000G
 ```
 # extract header
-zcat ALL.chr22.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz | grep "#"  > tmp1
+zcat ALL.chr22.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz | grep "##"  > tmp1
+echo '##ALT=<ID=CN34,Description="Copy number allele: 34 copies">' >> tmp1
+echo '##contig=<ID=15,assembly=b37,length=102531392>' >> tmp1
+zcat ALL.chr22.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz | grep "#" | grep -v "##"  >> tmp1
 
 # extract a subset
 for chr in {20..22};do
@@ -62,6 +65,17 @@ mv GRCh* data/1kgp/GRCh37/
 
 # remove tmp files (careful!)
 # rm tmp*
+```
+
+### Data without AC or AN
+This is to make sure that AF is counted directly using GT field genotypes
+
+```
+# without duplicates
+bcftools annotate -Oz -x INFO/AN,INFO/AC GRCh37_example_data.vcf.gz > GRCh37_example_data.vcf.tmp.gz
+mv GRCh37_example_data.vcf.tmp.gz GRCh37_example_data.vcf.gz
+tabix -f -p vcf GRCh37_example_data.vcf.gz
+
 ```
 
 ### create example data with duplicates
@@ -96,3 +110,4 @@ mv GRCh* data/1kgp/GRCh37/
 # remove tmp files (careful!)
 # rm tmp*
 ```
+
