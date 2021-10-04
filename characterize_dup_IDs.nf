@@ -44,8 +44,8 @@ process calc_af_from_genotype {
       tuple val(id), path('allele_freqs')
     script:
       """
-      bcftools plugin fill-tags extracted.vcf.gz -Ou -- --tags 'AF,AC,AN' | bgzip -c  > filled.gz
-      #calc_af_from_genotype.sh filled.gz > "allele_freqs"
+      #bcftools plugin fill-tags extracted.vcf.gz -Ou -- --tags 'AF,AC,AN' | bgzip -c  > filled.gz
+      calc_af_from_genotype.sh filled.gz > "allele_freqs"
       """
 }
 

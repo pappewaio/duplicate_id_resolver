@@ -63,13 +63,13 @@ zcat tmp2.vcf.gz | grep "#"  > tmp2_header
 zcat tmp2.vcf.gz | grep -v "#" > tmp2_rest
 
 # Take out 5 random rows to use as duplicates
-cat tmp2_rest | awk '
+cat tmp2_rest <( awk '
   NR==20{print $0}
   NR==134{print $0}
   NR==354{print $0}
   NR==687{print $0}
   NR==870{print $0}
-' > tmp2_rest_dup
+' tmp2_rest) > tmp2_rest_dup
 
 # sort and make tabix index
 sort -t "$(printf '\t')" -k2,1 -k2,2n tmp2_rest > tmp2b
