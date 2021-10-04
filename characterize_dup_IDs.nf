@@ -29,10 +29,35 @@ process extract_from_vcf {
     input:
       tuple val(id), path(vcfin), path(filein)
     output:
+      tuple val(id), path('extracted.vcf.gz'), path('extracted.vcf.gz.tbi')
+    script:
+      """
+      extract_from_vcf.sh ${filein} ${vcfin} "extracted.vcf.gz"
+      """
+}
+
+process calc_af_from_genotype {
+    publishDir "${params.intermediates}/${id}", mode: 'rellink', overwrite: true
+    input:
+      tuple val(id), path("extracted.vcf.gz"), path("extracted.vcf.gz.tbi")
+    output:
+      tuple val(id), path('allele_freqs')
+    script:
+      """
+      bcftools plugin fill-tags extracted.vcf.gz -Ou -- --tags 'AF,AC,AN' | bgzip -c  > filled.gz
+      #calc_af_from_genotype.sh filled.gz > "allele_freqs"
+      """
+}
+
+process split_based_on_id {
+    publishDir "${params.intermediates}/${id}", mode: 'rellink', overwrite: true
+    input:
+      tuple val(id), path(vcfin)
+    output:
       tuple val(id), path('extracted.vcf.gz')
     script:
       """
-      extract_from_vcf.sh ${filein} ${vcfin} > "extracted.vcf.gz"
+      split_based_on_id.sh ${vcfin} > "split.vcf.gz"
       """
 }
 
@@ -51,6 +76,8 @@ workflow {
     .join(find_duplicated_entries.out, by:0)
     .set { to_extract_vcf }
   extract_from_vcf(to_extract_vcf)
+
+  calc_af_from_genotype(extract_from_vcf.out)
 
 }
 
