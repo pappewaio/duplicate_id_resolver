@@ -5,7 +5,7 @@ characterize and manipulate duplicate IDs in VCFs
 Right now this tool is built to add information to an in-house imputation project, but it is written to be used on any vcf file.
 
 ## Run the script
-It is possible to submit a set of vcf files, each will be given a map file with all coordinates according to dbsnp151
+It is possible to submit a set of vcf files, if they have similar names and are placed in the same directory. This can be achieved by symlinking to a temp diretory if required.
 
 ```
 # install nextflow using mamba (requires conda/mamba)
