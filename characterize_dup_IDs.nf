@@ -12,7 +12,7 @@ process extract_ids_from_vcf_and_create_index {
       """
 }
 
-process find_duplicated_entries {
+process find_duplicated_ids {
     publishDir "${params.intermediates}/${id}", mode: 'rellink', overwrite: true
     input:
       tuple val(id), path(filein)
@@ -20,7 +20,7 @@ process find_duplicated_entries {
       tuple val(id), path('duplicate_ids')
     script:
       """
-      find_duplicate_ids.sh ${filein} > "duplicate_ids"
+      find_duplicated_ids.sh ${filein} > "duplicate_ids"
       """
 }
 
@@ -44,7 +44,7 @@ process calc_af_from_genotype {
       tuple val(id), path("${id}_allele_freqs")
     script:
       """
-      calc_af_from_genotype.sh extracted.vcf.gz > "${id}_allele_freqs"
+      calc_af_from_genotype.sh extracted.vcf.gz "${id}_allele_freqs"
       """
 }
 
@@ -58,9 +58,9 @@ workflow {
   
 
   extract_ids_from_vcf_and_create_index(vcf_filename_tracker_added)
-  find_duplicated_entries(extract_ids_from_vcf_and_create_index.out)
+  find_duplicated_ids(extract_ids_from_vcf_and_create_index.out)
   vcf_filename_tracker_added
-    .join(find_duplicated_entries.out, by:0)
+    .join(find_duplicated_ids.out, by:0)
     .set { to_extract_vcf }
   extract_from_vcf(to_extract_vcf)
 

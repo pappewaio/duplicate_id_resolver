@@ -4,10 +4,11 @@ outfile=$3
 
 # Add index, etc
 
-#extract header
+# extract header
 zcat ${infile2} | grep "#"  > tmp1
 
-#take out 5 random rows to use as duplicates
+# Extract all rows from vcf based on the file with duplicate IDs and their rowindex
+# The rowindex is the key of the join (here done using awk and a hash map).
 awk 'NR==FNR{a[$1];next} FNR in a{print $0}' ${infile1} <(zcat ${infile2}) > tmp2
 
 # sort and make tabix index

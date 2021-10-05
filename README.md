@@ -17,10 +17,10 @@ mamba create -n duplicate_id_resolver --channel bioconda \
 # Activate environment
 conda activate duplicate_id_resolver
 
-# Run a single file with duplicates
+# Run a single file with duplicates (right now with triplicates)
 nextflow characterize_dup_IDs.nf --input 'data/1kgp/GRCh37/GRCh37_example_data_duplicates.vcf.gz'
 
-# Run a single file without duplicates
+# Run a single file without duplicates (right now with triplicates)
 nextflow characterize_dup_IDs.nf --input 'data/1kgp/GRCh37/GRCh37_example_data.vcf.gz'
 
 # Check output
@@ -32,6 +32,16 @@ nextflow characterize_dup_IDs.nf --input 'data/1kgp/GRCh37/GRCh37_example_data*.
 ```
 
 ## DEV
+
+### Run unit tests
+
+```
+# Activate environment
+conda activate duplicate_id_resolver
+
+# Run tests
+./tests/run-unit-tests.sh
+```
 
 ### Download source 1000G
 ```

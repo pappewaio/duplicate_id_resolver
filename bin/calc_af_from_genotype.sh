@@ -1,7 +1,9 @@
-
 infile=${1}
+outfile=${2}
 
-bcftools plugin fill-tags ${infile} -Ou -- --tags 'AF,AC,AN' | bcftools query -f'%CHROM\t%POS\t%ID\t%REF\t%ALT\t%AN\t%AC\t%AF\n' 
+echo -e "CHROM\tPOS\tID\tREF\tALT\tAN\tAC\tAF" > "${outfile}"
+bcftools plugin fill-tags ${infile} -Ou -- --tags 'AF,AC,AN' | bcftools query -f'%CHROM\t%POS\t%ID\t%REF\t%ALT\t%AN\t%AC\t%AF\n'  >> "${outfile}"
+
 
 
 
