@@ -24,7 +24,11 @@ nextflow characterize_dup_IDs.nf --input 'data/1kgp/GRCh37/GRCh37_example_data_d
 nextflow characterize_dup_IDs.nf --input 'data/1kgp/GRCh37/GRCh37_example_data.vcf.gz'
 
 # Check output
-zcat out/mapfiles/GRCh37_example_data.vcf.map.gz | head | column -t
+cat out/allele_freqs/GRCh37_example_data_duplicates.vcf_allele_freqs | head | column -t
+
+# Run multiple files in parallell(using '*')
+nextflow characterize_dup_IDs.nf --input 'data/1kgp/GRCh37/GRCh37_example_data*.vcf.gz'
+
 ```
 
 ## DEV
