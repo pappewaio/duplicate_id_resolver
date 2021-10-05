@@ -2,7 +2,7 @@
 characterize and manipulate duplicate IDs in VCFs
 
 ## Introduction
-Right now this tool is built to add information to an in-house imputation project, but it is written to be used on any vcf file. For speed purposes, we use the dbsnp reference data from the cleansumstats pipeline. If necessary, I will add in this package how to create the used dbsnp reference data format from scratch.
+Right now this tool is built to add information to an in-house imputation project, but it is written to be used on any vcf file.
 
 ## Run the script
 It is possible to submit a set of vcf files, each will be given a map file with all coordinates according to dbsnp151
