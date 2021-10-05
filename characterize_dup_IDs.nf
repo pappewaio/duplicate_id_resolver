@@ -37,27 +37,14 @@ process extract_from_vcf {
 }
 
 process calc_af_from_genotype {
-    publishDir "${params.intermediates}/${id}", mode: 'rellink', overwrite: true
+    publishDir "${params.outdir}/allele_freqs", mode: 'copy', overwrite: true
     input:
       tuple val(id), path("extracted.vcf.gz"), path("extracted.vcf.gz.tbi")
     output:
-      tuple val(id), path('allele_freqs')
+      tuple val(id), path("${id}_allele_freqs")
     script:
       """
-      #bcftools plugin fill-tags extracted.vcf.gz -Ou -- --tags 'AF,AC,AN' | bgzip -c  > filled.gz
-      calc_af_from_genotype.sh filled.gz > "allele_freqs"
-      """
-}
-
-process split_based_on_id {
-    publishDir "${params.intermediates}/${id}", mode: 'rellink', overwrite: true
-    input:
-      tuple val(id), path(vcfin)
-    output:
-      tuple val(id), path('extracted.vcf.gz')
-    script:
-      """
-      split_based_on_id.sh ${vcfin} > "split.vcf.gz"
+      calc_af_from_genotype.sh extracted.vcf.gz > "${id}_allele_freqs"
       """
 }
 

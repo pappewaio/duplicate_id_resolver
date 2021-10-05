@@ -1,7 +1,7 @@
 
 infile=${1}
 
-bcftools plugin fill-tags ${infile} -Ou -- --tags 'AF,AC,AN' | bcftools query -f'%CHROM\t%POS\t%REF\t%ALT\t%AN\t%AC\t%AF\n' 
+bcftools plugin fill-tags ${infile} -Ou -- --tags 'AF,AC,AN' | bcftools query -f'%CHROM\t%POS\t%ID\t%REF\t%ALT\t%AN\t%AC\t%AF\n' 
 
 
 
