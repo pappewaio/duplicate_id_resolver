@@ -1,6 +1,8 @@
 # duplicate_id_resolver
 characterize and manipulate duplicate IDs in VCFs
 
+Version: 1.0.0
+
 ## Introduction
 Right now this tool is built to add information to an in-house imputation project, but it is written to be used on any vcf file.
 
