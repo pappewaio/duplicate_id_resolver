@@ -6,7 +6,7 @@ Version: 1.0.0
 ## Introduction
 Right now this tool is built to add information to an in-house imputation project, but it is written to be used on any vcf file.
 
-## Run the script
+## Step 1
 It is possible to submit a set of vcf files, if they have similar names and are placed in the same directory. This can be achieved by symlinking to a temp diretory if required.
 
 ```
@@ -33,6 +33,23 @@ nextflow characterize_dup_IDs.nf --input 'data/1kgp/GRCh37/GRCh37_example_data*.
 
 ```
 
+## Step 2
+The output from the first step can be analyzed a bit more regarding their frequencies:
+- Remove all entries with more than two of the same ID
+- Tabularize all 
+- bin allele frequecies
+- Create a distributional chart
+
+This is most easily done using R as the files are much smaller than the original vcfs
+
+```
+Rscript bin/summarize_allele_freqs.R \
+  "out/allele_freqs/GRCh37_example_data_duplicates.vcf_allele_freqs" \
+  "out/allele_freq_tabularizes" \
+  "chr22_"
+```
+
+
 ## DEV
 
 ### Run unit tests
@@ -55,11 +72,35 @@ done
 
 ### create example data from 1000G
 ```
+# Make entries so we not only have '.'
+# exclude multiallelics (which we will synthetically make as duplicates later)
+# and select only first 1000 rows
 for chr in {20..22};do
-  zcat ALL.chr22.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz | head -n1000 > tmp1_chr${chr}
+  # save header
+  zcat ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz \
+  | head -n10000 | awk '$0~"#" {print $0}' > tmp_header_chr${chr}
+
+  zcat ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz \
+  | awk -vOFS="\t" '
+      $0!~"#" && $5!~"," {$3=$1"_"$2"_"$4"_"$5; print $0}
+    ' \
+  | head -n1000 \
+  > tmp_body_chr${chr}
+
+  # sort body
+  sort -t "$(printf '\t')" -k2,1 -k2,2n tmp_body_chr${chr} > tmp_body_chr${chr}_sorted
+  
+  # add header
+  cat tmp_header_chr${chr} tmp_body_chr${chr}_sorted > tmp1_chr${chr}
+
+  # bgzip
+  bgzip -c tmp1_chr${chr} > tmp1_chr${chr}.gz
+
+  # index
+  tabix -p vcf tmp1_chr${chr}.gz
 done
 
-bcftools concat -Oz tmp1_chr20 tmp1_chr21 tmp1_chr22 > tmp2_chr20-22.vcf.gz
+bcftools concat -Oz tmp1_chr20.gz tmp1_chr21.gz tmp1_chr22.gz > tmp2_chr20-22.vcf.gz
 
 #clean temp files
 ```
