@@ -12,7 +12,7 @@ process extract_ids_from_vcf_and_create_index {
       """
 }
 
-process find_duplicated_entries {
+process find_duplicated_ids {
     publishDir "${params.intermediates}/${id}", mode: 'rellink', overwrite: true
     input:
       tuple val(id), path(filein)
@@ -20,7 +20,7 @@ process find_duplicated_entries {
       tuple val(id), path('duplicate_ids')
     script:
       """
-      find_duplicate_ids.sh ${filein} > "duplicate_ids"
+      find_duplicated_ids.sh ${filein} > "duplicate_ids"
       """
 }
 
@@ -37,27 +37,14 @@ process extract_from_vcf {
 }
 
 process calc_af_from_genotype {
-    publishDir "${params.intermediates}/${id}", mode: 'rellink', overwrite: true
+    publishDir "${params.outdir}/allele_freqs", mode: 'copy', overwrite: true
     input:
       tuple val(id), path("extracted.vcf.gz"), path("extracted.vcf.gz.tbi")
     output:
-      tuple val(id), path('allele_freqs')
+      tuple val(id), path("${id}_allele_freqs")
     script:
       """
-      bcftools plugin fill-tags extracted.vcf.gz -Ou -- --tags 'AF,AC,AN' | bgzip -c  > filled.gz
-      #calc_af_from_genotype.sh filled.gz > "allele_freqs"
-      """
-}
-
-process split_based_on_id {
-    publishDir "${params.intermediates}/${id}", mode: 'rellink', overwrite: true
-    input:
-      tuple val(id), path(vcfin)
-    output:
-      tuple val(id), path('extracted.vcf.gz')
-    script:
-      """
-      split_based_on_id.sh ${vcfin} > "split.vcf.gz"
+      calc_af_from_genotype.sh extracted.vcf.gz "${id}_allele_freqs"
       """
 }
 
@@ -71,9 +58,9 @@ workflow {
   
 
   extract_ids_from_vcf_and_create_index(vcf_filename_tracker_added)
-  find_duplicated_entries(extract_ids_from_vcf_and_create_index.out)
+  find_duplicated_ids(extract_ids_from_vcf_and_create_index.out)
   vcf_filename_tracker_added
-    .join(find_duplicated_entries.out, by:0)
+    .join(find_duplicated_ids.out, by:0)
     .set { to_extract_vcf }
   extract_from_vcf(to_extract_vcf)
 
