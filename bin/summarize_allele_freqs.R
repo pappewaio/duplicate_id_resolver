@@ -59,7 +59,7 @@ ta <- read.table(infile, header=TRUE,sep="\t", stringsAsFactors=FALSE)
   ta[-ix,]
 }
 
-.joint_lowest_freq <- function(ta){
+.joint_highest_freq <- function(ta){
   a <- ta[,8]>=ta[,12]
   b <- ta[,8]<ta[,12]
   c <- rep(NA,nrow(ta))
@@ -67,7 +67,7 @@ ta <- read.table(infile, header=TRUE,sep="\t", stringsAsFactors=FALSE)
   c[b] <- ta[b,12]
   c
 }
-.joint_highest_freq <- function(ta){
+.joint_lowest_freq <- function(ta){
   a <- ta[,8]>=ta[,12]
   b <- ta[,8]<ta[,12]
   c <- rep(NA,nrow(ta))
