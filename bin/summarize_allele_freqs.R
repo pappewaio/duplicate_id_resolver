@@ -34,7 +34,7 @@ ta <- read.table(infile, header=TRUE,sep="\t", stringsAsFactors=FALSE)
 
 .get_multiplicates_index <- function(x, th){
   le <- unlist(lapply(split(x,x), length))
-  nix <- as.integer(names(le[le>th]))
+  nix <- names(le[le>th])
   which(x %in% nix)
 }
 
@@ -87,7 +87,9 @@ ta <- ta[ix,]
 ix <- .get_multiplicates_index(ta[,"ID"], 2)
 check1 <-.get_selection_by_index(ta, ix)
 write.table(check1, file=paste(outdir,"/",outprefix,"triplicates-or-more.tsv", sep=""), sep="\t", row.names=FALSE, quote=FALSE)
-ta <-.get_selection_by_index(ta, -ix)
+if(length(ix)>0){
+  ta <- .get_selection_by_index(ta, -ix)
+}
 
 # merge dups
 ta <- .merge_dups(ta)
@@ -97,7 +99,9 @@ ix <- .ref_not_agree_for_dups(ta)
 check2 <- ta[ix,]
 write.table(check2, file=paste(outdir,"/",outprefix,"ref_not_agree_for_dups.tsv", sep=""), sep="\t", row.names=FALSE, quote=FALSE)
 #remove not agreeing dups
-ta <- ta[-ix,]
+if(length(ix)>0){
+  ta <- ta[-ix,]
+}
 
 # add joint freq
 a <- .joint_lowest_freq(ta)
