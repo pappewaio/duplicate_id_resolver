@@ -14,7 +14,8 @@ It is possible to submit a set of vcf files, if they have similar names and are 
 mamba create -n duplicate_id_resolver --channel bioconda \
   nextflow==20.10.0 \
   bcftools=1.9 \
-  tabix
+  tabix \
+  r-base
 
 # Activate environment
 conda activate duplicate_id_resolver
