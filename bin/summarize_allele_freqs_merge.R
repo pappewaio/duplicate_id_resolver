@@ -62,11 +62,16 @@ for(i in 1:length(fl)){
   all[[i]] <- ta
 }
 
+
 # merge
 rownames <- all[[1]]
 rownames[,1] <- rownames(rownames)
 colnames(rownames) <- "bins"
 all.merge <- do.call("cbind", c(rownames, all))
+
+total <- apply(all.merge[,2:ncol(all.merge)],1,sum)
+all.merge[,"total"] <- total
+
 system(paste("mkdir -p ",outdir, sep=""))
 write.table(all.merge, file=paste(outdir,"/",outname, sep=""), sep="\t", row.names=FALSE, quote=FALSE)
 
