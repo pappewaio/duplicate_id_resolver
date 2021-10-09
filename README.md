@@ -58,7 +58,7 @@ Rscript bin/summarize_allele_freqs_merge.R \
     "out/allele_freq_tabularizes" \
     "highest-freq-of-pairs-distributon" \
     "out/allele_freq_summary" \
-    "cohort5_"
+    "cohort5_highest-freq-of-pairs-distributon"
 ```
 
 

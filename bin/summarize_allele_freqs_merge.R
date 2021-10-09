@@ -3,7 +3,7 @@ args = commandArgs(trailingOnly=TRUE)
 indir <- args[1]
 pattern <- args[2]
 outdir <- args[3]
-outprefix <- args[4]
+outname <- args[4]
 
 #indir="/tmp/test_allele_freq_distr"
 #pattern="allele_freq_distr"
@@ -68,5 +68,5 @@ rownames[,1] <- rownames(rownames)
 colnames(rownames) <- "bins"
 all.merge <- do.call("cbind", c(rownames, all))
 system(paste("mkdir -p ",outdir, sep=""))
-write.table(all.merge, file=paste(outdir,"/",outprefix,"freq-of-pairs-distributon-merge", sep=""), sep="\t", row.names=FALSE, quote=FALSE)
+write.table(all.merge, file=paste(outdir,"/",outname, sep=""), sep="\t", row.names=FALSE, quote=FALSE)
 
