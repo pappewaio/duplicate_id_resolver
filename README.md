@@ -50,6 +50,17 @@ Rscript bin/summarize_allele_freqs.R \
   "chr22_"
 ```
 
+## Step 3
+The output from the second step can be combined to one file per experiment/cohort
+
+```
+Rscript bin/summarize_allele_freqs_merge.R \
+    "out/allele_freq_tabularizes" \
+    "highest-freq-of-pairs-distributon" \
+    "out/allele_freq_summary" \
+    "cohort5_"
+```
+
 
 ## DEV
 
