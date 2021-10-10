@@ -61,6 +61,14 @@ Rscript bin/summarize_allele_freqs_merge.R \
     "cohort5_highest-freq-of-pairs-distributon"
 ```
 
+## Step 4
+Run this code to replace all duplicates with their chr_pos_ref_alt ID to make them unique. In this way we won't lose any data except the link to rsid, which we will keep in a metadata file in case someone needs it. 
+
+```
+# Run a single file with duplicates
+nextflow replace_dup_IDs_with_chrposrefalt.nf --input 'data/1kgp/GRCh37/GRCh37_example_data_duplicates.vcf.gz' 
+```
+
 
 ## DEV
 
