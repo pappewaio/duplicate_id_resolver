@@ -1,7 +1,7 @@
 # duplicate_id_resolver
 characterize and manipulate duplicate IDs in VCFs
 
-Version: 1.0.0
+Version: 1.1.0
 
 ## Introduction
 Right now this tool is built to add information to an in-house imputation project, but it is written to be used on any vcf file.
@@ -69,6 +69,9 @@ Run this code to replace all duplicates with their chr_pos_ref_alt ID to make th
 ```
 # Run a single file with duplicates
 nextflow replace_dup_IDs_with_chrposrefalt.nf --input 'data/1kgp/GRCh37/GRCh37_example_data_duplicates.vcf.gz' 
+
+# Check that one of the duplicates have been changed to our expectations
+zcat out/updated_vcf/GRCh37_example_data_duplicates.vcf.gz | grep -v "#" | cut -f1-6| grep 61098
 ```
 
 ## Step 5 - Replace ids in QC-files
@@ -88,11 +91,24 @@ outfile="out/mapfiles/$(basename ${infile%.vcf.gz})_mapfile"
 IF there are many mapfiles that corresponds to one qc file, then this is the time to merge the mapfiles into one file, which then can be used using the code below.
 
 ```
-# Symlink auxillary repo
-ln -s ../replace_rsid_in_qcfiles .
+# Run a single file - example data 1
+# using the external repo `replace_rsid_in_qcfiles`
+nextflow run ../replace_rsid_in_qcfiles/replace_rsid_in_qcfile_from_mapfiles.nf --input 'data/runfile/runfile1.txt' --outdir out
 
 # Run a single file - example data 1
-nextflow run replace_rsid_in_qcfiles/replace_rsid_in_qcfile_from_mapfiles.nf --input 'data/runfile/runfile1.txt' --outdir out
+nextflow run ../replace_rsid_in_qcfiles/replace_rsid_in_qcfile_from_mapfiles.nf --input 'data/runfile/runfile2.txt' --outdir out
+
+```
+
+Visually inspect how the changed IDs have been changed. We expect that the IDs have been renamed from dup{nr} -> chr_pos_ref_alt.
+
+```
+# Check that one of the duplicates have been changed to our expectations
+zcat out/updated_qc_files/imputeQualityMetrics_dup.txt.gz | grep -v "#" | cut -f1-5 -d" "| grep 61098
+
+# Output
+##20 61098 20_61098_C_A C A
+##20 61098 20_61098_C_T C T
 
 ```
 
@@ -222,7 +238,7 @@ MAF and the other stats will just be 0.1, 0.2, 0.3, etc (which should be fine as
 
 ```
 mkdir -p data/imputeQCmetrics
-echo -e "CHR POS ID REF ALT MAF AR2 DR2 Hwe DR2 Accuracy Score" > data/imputeQCmetrics/imputeQualityMetrics.txt
+echo -e "CHR POS ID REF ALT MAF AR2 DR2 Hwe DR2 Accuracy Score NEWID" > data/imputeQCmetrics/imputeQualityMetrics.txt
 zcat data/1kgp/GRCh37/GRCh37_example_data.vcf.gz | grep -v "#" | awk '{print $1, $2, $3, $4, $5, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 }'  >> data/imputeQCmetrics/imputeQualityMetrics.txt
 
 echo -e "CHR POS ID REF ALT MAF AR2 DR2 Hwe DR2 Accuracy Score" > data/imputeQCmetrics/imputeQualityMetrics_dup.txt
@@ -247,10 +263,10 @@ MAF and the other stats will just be 0.1, 0.2, 0.3, etc (which should be fine as
 ```
 mkdir -p data/SNP_QC
 echo -e "CHROM POSITION ID REF ALT GenotypeWaveAssociation ImputeBatchAssociation HWE MAF ImputeRsq SamplePlateAssociation SSIPlateAssociation" > data/SNP_QC/SNP_QC.out
-zcat data/1kgp/GRCh37/GRCh37_example_data.vcf.gz | tail -n+2 | awk '{print $1, $2, $3, $4, $5, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 }' >> data/SNP_QC/SNP_QC.out
+zcat data/1kgp/GRCh37/GRCh37_example_data.vcf.gz | grep -v "#" | awk '{print $1, $2, $3, $4, $5, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 }' >> data/SNP_QC/SNP_QC.out
 
 echo -e "CHROM POSITION ID REF ALT GenotypeWaveAssociation ImputeBatchAssociation HWE MAF ImputeRsq SamplePlateAssociation SSIPlateAssociation" > data/SNP_QC/SNP_QC_dup.out
-zcat data/1kgp/GRCh37/GRCh37_example_data_duplicates.vcf.gz | tail -n+2 | awk '{print $1, $2, $3, $4, $5, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 }' >> data/SNP_QC/SNP_QC_dup.out
+zcat data/1kgp/GRCh37/GRCh37_example_data_duplicates.vcf.gz | grep -v "#" | awk '{print $1, $2, $3, $4, $5, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 }' >> data/SNP_QC/SNP_QC_dup.out
 
 #zip it
 gzip -c data/SNP_QC/SNP_QC.out > data/SNP_QC/SNP_QC.out.gz 

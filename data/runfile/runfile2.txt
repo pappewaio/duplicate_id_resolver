@@ -1,0 +1,1 @@
+data/SNP_QC/SNP_QC_dup.out.gz out/mapfiles/GRCh37_example_data_duplicates_mapfile.gz
